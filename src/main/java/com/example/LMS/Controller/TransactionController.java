@@ -1,6 +1,8 @@
 package com.example.LMS.Controller;
 
 import com.example.LMS.Model.Book;
+import com.example.LMS.Model.Student;
+import com.example.LMS.ResponseDto.StudentResponseDto;
 import com.example.LMS.Service.BookService;
 import com.example.LMS.Service.TransactionService;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +70,18 @@ public class TransactionController {
         catch (Exception e) {
             log.error("Unable to fetch the total fine Amount.");
             return new ResponseEntity<>(e.getMessage() , HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/getStudentReadsMostBooks")
+    public ResponseEntity<StudentResponseDto> getStudentReadsMostBooks(){
+        try {
+            StudentResponseDto studentResponseDto = transactionService.getStudentReadsMostBooks();
+            return new ResponseEntity<>(studentResponseDto , HttpStatus.OK);
+        }
+        catch (Exception e) {
+            log.error("Unable to fetch the student who read most books.");
+            return new ResponseEntity<>(null , HttpStatus.BAD_REQUEST);
         }
     }
 }

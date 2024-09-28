@@ -5,18 +5,17 @@ import com.example.LMS.Enum.TransactionStatus;
 import com.example.LMS.Enum.TransactionType;
 import com.example.LMS.Model.Book;
 import com.example.LMS.Model.LibraryCard;
+import com.example.LMS.Model.Student;
 import com.example.LMS.Model.Transaction;
 import com.example.LMS.Repository.BookRepository;
 import com.example.LMS.Repository.LibraryCardRepository;
 import com.example.LMS.Repository.TransactionRepository;
+import com.example.LMS.ResponseDto.StudentResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -170,5 +169,40 @@ public class TransactionService {
         }
 
         return "Total fine Amount is: " + fineAmount;
+    }
+
+    public StudentResponseDto getStudentReadsMostBooks() throws Exception{
+        List<Transaction> transactionList = transactionRepository.findByTransactionType(TransactionType.RETURN);
+
+        if(transactionList.isEmpty()){
+            throw new Exception("No transaction has transaction type RETURN so , No student can read a single book.");
+        }
+
+        HashMap<Integer,Integer> map = new HashMap<>();
+
+        int max = Integer.MIN_VALUE , Id = 0;
+        for(Transaction transaction : transactionList){
+
+            map.put(transaction.getLibraryCard().getLibraryCardId() , map.getOrDefault(transaction.getLibraryCard().getLibraryCardId() , 0) + 1);
+            if(map.get(transaction.getLibraryCard().getLibraryCardId()) > max){
+
+                max = map.get(transaction.getLibraryCard().getLibraryCardId());
+                Id = transaction.getLibraryCard().getLibraryCardId();
+            }
+        }
+
+        Optional<LibraryCard> optional = libraryCardRepository.findById(Id);
+
+        if(optional.isEmpty()){
+            throw new Exception("Could not fetch the Library Card.");
+        }
+
+        LibraryCard libraryCard = optional.get();
+        Student student = libraryCard.getStudent();
+
+        StudentResponseDto studentResponseDto = new StudentResponseDto(student.getRollNo() , student.getAge() , student.getName()
+            , student.getEmailId() , student.getDepartment() , student.getGender());
+
+        return studentResponseDto;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.LMS.Model;
 
 import com.example.LMS.Enum.CardStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
